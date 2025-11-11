@@ -8,8 +8,10 @@
  "field_order": [
   "enabled",
   "allow_auto_read_receipt",
-  "token",
   "url",
+  "session",
+  "token",
+  "waha_webhook_url",
   "version",
   "phone_id",
   "business_id",
@@ -18,15 +20,46 @@
  ],
  "fields": [
   {
-   "fieldname": "token",
-   "fieldtype": "Password",
-   "label": "Token",
-   "length": 250
+   "default": "0",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled"
+  },
+  {
+   "default": "1",
+   "fieldname": "allow_auto_read_receipt",
+   "fieldtype": "Check",
+   "label": "Allow Auto Read Receipt"
   },
   {
    "fieldname": "url",
    "fieldtype": "Data",
-   "label": "URL"
+   "label": "WAHA Host URL",
+   "reqd": 1,
+   "description": "Base URL of your WAHA instance, e.g. https://waha.example.com"
+  },
+  {
+   "fieldname": "session",
+   "fieldtype": "Data",
+   "label": "WAHA Session",
+   "reqd": 1,
+   "description": "Session identifier configured in your WAHA instance."
+  },
+  {
+   "fieldname": "token",
+   "fieldtype": "Password",
+   "label": "WAHA API Key",
+   "length": 250,
+   "reqd": 1,
+   "description": "API key generated from your WAHA instance."
+  },
+  {
+   "fieldname": "waha_webhook_url",
+   "fieldtype": "Data",
+   "label": "WAHA Webhook URL",
+   "read_only": 1,
+   "description": "Provide this URL to WAHA to send webhook events back to Frappe.",
+   "no_copy": 1
   },
   {
    "fieldname": "version",
@@ -44,26 +77,14 @@
    "label": "Business ID"
   },
   {
-   "fieldname": "webhook_verify_token",
-   "fieldtype": "Data",
-   "label": "Webhook Verify Token"
-  },
-  {
-   "default": "0",
-   "fieldname": "enabled",
-   "fieldtype": "Check",
-   "label": "Enabled"
-  },
-  {
    "fieldname": "app_id",
    "fieldtype": "Data",
    "label": "App ID"
   },
   {
-   "default": "1",
-   "fieldname": "allow_auto_read_receipt",
-   "fieldtype": "Check",
-   "label": "Allow Auto Read Receipt"
+   "fieldname": "webhook_verify_token",
+   "fieldtype": "Data",
+   "label": "Webhook Verify Token"
   }
  ],
  "grid_page_length": 50,
