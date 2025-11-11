@@ -64,7 +64,7 @@ app_include_js = "/assets/frappe_whatsapp_waha/js/frappe_whatsapp_waha.js"
 # Installation
 # ------------
 
-# before_install = "frappe_whatsapp_waha.install.before_install"
+before_install = "frappe_whatsapp_waha.install.before_install"
 # after_install = "frappe_whatsapp_waha.install.after_install"
 
 # Uninstallation
