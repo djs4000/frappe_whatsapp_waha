@@ -3,15 +3,15 @@ from setuptools import setup, find_packages
 with open("requirements.txt") as f:
     install_requires = f.read().strip().split("\n")
 
-# get version from __version__ variable in frappe_whatsapp/__init__.py
-from frappe_whatsapp import __version__ as version
+# get version from __version__ variable in frappe_whatsapp_waha/__init__.py
+from frappe_whatsapp_waha import __version__ as version
 
 setup(
-    name="frappe_whatsapp",
+    name="frappe_whatsapp_waha",
     version=version,
-    description="WhatsApp integration for frappe",
-    author="Shridhar Patil",
-    author_email="shrip.dev@gmail.com",
+    description="WhatsApp integration for Frappe using the WAHA API (forked from shridarpatil/frappe_whatsapp)",
+    author="djs4000",
+    author_email="djs4000@gmail.com",
     packages=find_packages(),
     zip_safe=False,
     include_package_data=True,

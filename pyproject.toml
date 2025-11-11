@@ -1,9 +1,9 @@
 [project]
-name = "frappe_whatsapp"
+name = "frappe_whatsapp_waha"
 authors = [
-    { name = "Shridhar Patil", email = "shrip.dev@gmail.com"}
+    { name = "djs4000", email = "djs4000@gmail.com"}
 ]
-description = "WhatsApp integration for frappe. Use directly meta API's without any 3rd party integration."
+description = "WhatsApp integration for Frappe using the WAHA API. Forked from shridarpatil/frappe_whatsapp."
 requires-python = ">=3.10"
 readme = "README.md"
 dynamic = ["version"]
