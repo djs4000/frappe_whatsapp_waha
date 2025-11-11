@@ -12,10 +12,6 @@
   "session",
   "token",
   "waha_webhook_url",
-  "version",
-  "phone_id",
-  "business_id",
-  "app_id",
   "webhook_verify_token"
  ],
  "fields": [
@@ -60,26 +56,6 @@
    "read_only": 1,
    "description": "Provide this URL to WAHA to send webhook events back to Frappe.",
    "no_copy": 1
-  },
-  {
-   "fieldname": "version",
-   "fieldtype": "Data",
-   "label": "Version"
-  },
-  {
-   "fieldname": "phone_id",
-   "fieldtype": "Data",
-   "label": "Phone ID"
-  },
-  {
-   "fieldname": "business_id",
-   "fieldtype": "Data",
-   "label": "Business ID"
-  },
-  {
-   "fieldname": "app_id",
-   "fieldtype": "Data",
-   "label": "App ID"
   },
   {
    "fieldname": "webhook_verify_token",

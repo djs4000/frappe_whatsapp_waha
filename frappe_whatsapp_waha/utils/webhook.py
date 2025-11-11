@@ -96,8 +96,15 @@ def post():
 				settings = frappe.get_doc(
 							"WhatsApp Settings", "WhatsApp Settings",
 						)
-				token = settings.get_password("token")
-				url = f"{settings.url}/{settings.version}/"
+                                token = settings.get_password("token")
+                                version = getattr(settings, "version", None)
+                                if not version:
+                                        frappe.log_error(
+                                                "WAHA webhook",
+                                                "Skipping media download because WhatsApp Settings no longer defines a Graph API version.",
+                                        )
+                                        continue
+                                url = f"{settings.url}/{version}/"
 
 
 				media_id = message[message_type]["id"]
