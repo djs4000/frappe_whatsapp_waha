@@ -23,6 +23,9 @@ class WhatsAppMessage(Document):
         if self.type != "Outgoing":
             return
 
+        if not self.message_type:
+            self.message_type = "Manual"
+
         try:
             if self.message_type == "Template" and not self.message_id:
                 self._send_template_message()
