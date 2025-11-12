@@ -55,8 +55,8 @@
    "read_only": 1,
    "description": "Provide this URL to WAHA to send webhook events back to Frappe.",
    "no_copy": 1
-  },
-],
+  }
+ ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
