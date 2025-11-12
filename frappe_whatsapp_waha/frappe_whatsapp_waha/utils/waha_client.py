@@ -14,10 +14,24 @@ import frappe
 class WahaAPIError(Exception):
     """Exception raised when a WAHA API request fails."""
 
-    def __init__(self, message: str, *, status_code: int | None = None, payload: Any | None = None) -> None:
+    def __init__(
+        self,
+        message: str,
+        *,
+        status_code: int | None = None,
+        payload: Any | None = None,
+        url: str | None = None,
+        method: str | None = None,
+        params: dict[str, Any] | None = None,
+        request_payload: Any | None = None,
+    ) -> None:
         super().__init__(message)
         self.status_code = status_code
         self.payload = payload or {}
+        self.url = url
+        self.method = method
+        self.params = params or {}
+        self.request_payload = request_payload
 
 
 @dataclass(slots=True)
@@ -76,26 +90,30 @@ class WahaClient:
     # ---- request helpers -------------------------------------------------
 
     def _headers(self, *, json_body: bool = True) -> dict[str, str]:
-        headers = {"Authorization": f"Bearer {self._token}"}
+        headers = {"X-Api-Key": self._token}
         if json_body:
             headers["Content-Type"] = "application/json"
         return headers
 
     def _request(self, method: str, path: str, *, json_payload: dict[str, Any] | None = None) -> WahaResponse:
         url = f"{self._base_url}/{path.lstrip('/')}"
-        params = {"session": self._session} if self._session else None
 
         try:
             response = requests.request(
                 method,
                 url,
-                params=params,
                 headers=self._headers(json_body=json_payload is not None),
                 json=json_payload,
                 timeout=frappe.conf.get("waha_timeout", 30),
             )
         except requests.RequestException as exc:
-            raise WahaAPIError(str(exc)) from exc
+            raise WahaAPIError(
+                str(exc),
+                url=url,
+                method=method,
+                params={},
+                request_payload=json_payload,
+            ) from exc
 
         if response.ok:
             try:
@@ -114,24 +132,55 @@ class WahaClient:
             payload = {"error": response.text}
             message = response.text or f"WAHA request failed with status {response.status_code}"
 
-        raise WahaAPIError(message.strip(), status_code=response.status_code, payload=payload)
+        raise WahaAPIError(
+            message.strip(),
+            status_code=response.status_code,
+            payload=payload,
+            url=response.url,
+            method=method,
+            params={},
+            request_payload=json_payload,
+        )
 
     # ---- public API ------------------------------------------------------
 
     def send_text(self, phone: str, body: str, *, preview_url: bool = True) -> WahaResponse:
-        payload = {"phone": phone, "body": body}
-        if preview_url:
-            payload["previewUrl"] = True
+        payload: dict[str, Any] = {
+            "chatId": self._as_chat_id(phone),
+            "text": body,
+            "reply_to": None,
+            "linkPreview": preview_url,
+            "linkPreviewHighQuality": False,
+        }
+        if self._session:
+            payload["session"] = self._session
         return self._request("POST", "api/sendText", json_payload=payload)
 
     def send_media_from_url(self, phone: str, url: str, *, caption: str | None = None) -> WahaResponse:
-        payload = {"phone": phone, "url": url}
+        payload: dict[str, Any] = {
+            "chatId": self._as_chat_id(phone),
+            "url": url,
+        }
         if caption:
             payload["caption"] = caption
             payload["body"] = caption
+        if self._session:
+            payload["session"] = self._session
         return self._request("POST", "api/sendFileFromUrl", json_payload=payload)
 
     def send_reaction(self, phone: str, message_id: str, emoji: str) -> WahaResponse:
-        payload = {"phone": phone, "messageId": message_id, "reaction": emoji}
+        payload: dict[str, Any] = {
+            "chatId": self._as_chat_id(phone),
+            "messageId": message_id,
+            "reaction": emoji,
+        }
+        if self._session:
+            payload["session"] = self._session
         return self._request("POST", "api/sendReaction", json_payload=payload)
+
+    def _as_chat_id(self, phone: str) -> str:
+        phone = (phone or "").strip()
+        if phone.endswith("@c.us"):
+            return phone
+        return f"{phone}@c.us"
 
