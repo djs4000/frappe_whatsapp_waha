@@ -1,0 +1,69 @@
+.iti {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    border: 1px solid var(--border-color, #d1d8dd);
+    border-radius: var(--border-radius-sm, 4px);
+    background-color: #fff;
+    min-height: 36px;
+}
+
+.iti__flag-container {
+    display: flex;
+    align-items: center;
+    border-right: 1px solid var(--border-color, #d1d8dd);
+    background-color: #f8fafc;
+    padding: 0 8px;
+    gap: 6px;
+}
+
+.iti__country-select {
+    border: none;
+    background: transparent;
+    font-size: 13px;
+    padding: 4px 0;
+    outline: none;
+    min-width: 160px;
+}
+
+.iti__country-select optgroup[label] {
+    font-weight: 600;
+    color: var(--text-color, #212529);
+}
+
+.iti__selected-dial-code {
+    font-weight: 600;
+    color: var(--text-muted, #6c757d);
+    min-width: 44px;
+}
+
+.iti__input {
+    flex: 1;
+    border: none;
+    padding: 6px 10px;
+    font-size: 13px;
+    outline: none;
+    background: transparent;
+    min-width: 140px;
+}
+
+.iti__input--invalid {
+    border-color: var(--red-500, #ef4444);
+    box-shadow: inset 0 0 0 1px var(--red-500, #ef4444);
+}
+
+.iti--invalid {
+    border-color: var(--red-500, #ef4444);
+    box-shadow: 0 0 0 1px var(--red-500, #ef4444);
+}
+
+.iti select:focus,
+.iti input:focus {
+    outline: none;
+}
+
+@media (max-width: 480px) {
+    .iti__country-select {
+        min-width: 120px;
+    }
+}
