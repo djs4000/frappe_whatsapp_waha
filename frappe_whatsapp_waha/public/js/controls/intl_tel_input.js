@@ -1,3 +1,6 @@
+const INTL_TEL_INPUT_CDN = "https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.5/build/js/intlTelInput.min.js";
+const INTL_TEL_INPUT_UTILS_CDN = "https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.5/build/js/utils.js";
+
 frappe.ui.form.ControlIntlTelInput = class ControlIntlTelInput extends frappe.ui.form.ControlData {
     static input_type = "tel";
 
@@ -11,18 +14,30 @@ frappe.ui.form.ControlIntlTelInput = class ControlIntlTelInput extends frappe.ui
     }
 
     _ensure_plugin() {
-        if (typeof intlTelInput === "function") {
+        if (typeof window.intlTelInput === "function") {
             this._init_plugin();
             return;
         }
 
-        frappe.require(["/assets/frappe_whatsapp_waha/js/vendor/intl_tel_input.js"]).then(() => {
-            this._init_plugin();
-        });
+        if (!this._intlLoader) {
+            this._intlLoader = frappe
+                .require([INTL_TEL_INPUT_CDN])
+                .catch((error) => {
+                    console.error("Failed to load intl-tel-input", error);
+                });
+        }
+
+        if (this._intlLoader) {
+            this._intlLoader.then(() => {
+                if (typeof window.intlTelInput === "function") {
+                    this._init_plugin();
+                }
+            });
+        }
     }
 
     _init_plugin() {
-        if (this.iti || typeof intlTelInput !== "function") {
+        if (this.iti || typeof window.intlTelInput !== "function") {
             return;
         }
 
@@ -31,11 +46,16 @@ frappe.ui.form.ControlIntlTelInput = class ControlIntlTelInput extends frappe.ui
             .map((code) => code.trim().toLowerCase())
             .filter(Boolean);
 
-        this.iti = intlTelInput(this.input, {
+        const initOptions = {
             preferredCountries: preferred.length ? preferred : ["us", "in"],
             initialCountry: (this.df.default_country || "auto").toLowerCase(),
-            separateDialCode: true
-        });
+            separateDialCode: true,
+            strictMode: true,
+            validationNumberTypes: ["FIXED_LINE_OR_MOBILE"],
+            loadUtils: () => import(INTL_TEL_INPUT_UTILS_CDN),
+        };
+
+        this.iti = window.intlTelInput(this.input, initOptions);
 
         if (this.value) {
             this.iti.setNumber(this.value);
