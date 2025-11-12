@@ -35,7 +35,7 @@ class WhatsAppMessage(Document):
         except WahaAPIError as exc:
             self.status = "Failed"
             self._log_api_error(exc.payload)
-            frappe.throw(f"Failed to send message: {exc}")
+            frappe.throw(f"Failed to send message: {exc.payload}")
         except Exception:
             self.status = "Failed"
             raise
