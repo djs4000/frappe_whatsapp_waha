@@ -34,7 +34,7 @@ class WhatsAppMessage(Document):
             self.status = "Success"
         except WahaAPIError as exc:
             self.status = "Failed"
-            self._log_api_error("Message", exc.payload)
+            self._log_api_error(exc.payload)
             frappe.throw(f"Failed to send message: {exc}")
         except Exception:
             self.status = "Failed"
@@ -61,7 +61,7 @@ class WhatsAppMessage(Document):
             response = client.send_text(recipient, message_body, preview_url=True)
 
         self.message_id = response.message_id()
-        self._log_api_success("Message", response.data)
+        self._log_api_success(response.data)
 
     def _send_template_message(self) -> None:
         template = frappe.get_doc("WhatsApp Templates", self.template)
@@ -106,7 +106,7 @@ class WhatsAppMessage(Document):
             response = client.send_text(recipient, message, preview_url=True)
 
         self.message_id = response.message_id()
-        self._log_api_success("Message", response.data)
+        self._log_api_success(response.data)
 
     # ------------------------------------------------------------------
     # Utilities
@@ -166,7 +166,21 @@ class WhatsAppMessage(Document):
             return self._prepare_attachment_link(self.attach)
         return None
 
-    def _log_api_error(self, template: str, payload: dict[str, Any]):
+    def _log_api_error(self, payload: dict[str, Any], *, context: str | None = None):
+        self._append_notification_log(payload, context=context, default_label="Manual Message")
+
+    def _log_api_success(self, payload: dict[str, Any], *, context: str | None = None):
+        self._append_notification_log(payload, context=context, default_label="Manual Message")
+
+    def _append_notification_log(
+        self,
+        payload: dict[str, Any],
+        *,
+        context: str | None = None,
+        default_label: str,
+    ) -> None:
+        template = self._resolve_notification_label(context, default_label=default_label)
+
         frappe.get_doc(
             {
                 "doctype": "WhatsApp Notification Log",
@@ -175,14 +189,17 @@ class WhatsAppMessage(Document):
             }
         ).insert(ignore_permissions=True)
 
-    def _log_api_success(self, template: str, payload: dict[str, Any]):
-        frappe.get_doc(
-            {
-                "doctype": "WhatsApp Notification Log",
-                "template": template,
-                "meta_data": frappe.as_json(payload or {}),
-            }
-        ).insert(ignore_permissions=True)
+    def _resolve_notification_label(self, context: str | None, *, default_label: str) -> str:
+        if context:
+            return context
+
+        if self.message_type == "Template" and self.template:
+            return self.template
+
+        if self.message_type:
+            return f"{self.message_type} Message"
+
+        return default_label
 
 
 def on_doctype_update():
