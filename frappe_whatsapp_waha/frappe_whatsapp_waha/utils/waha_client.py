@@ -90,18 +90,20 @@ class WahaClient:
     # ---- request helpers -------------------------------------------------
 
     def _headers(self, *, json_body: bool = True) -> dict[str, str]:
-        headers = {"X-Api-Key": self._token}
+        headers = {"Authorization": f"Bearer {self._token}"}
         if json_body:
             headers["Content-Type"] = "application/json"
         return headers
 
     def _request(self, method: str, path: str, *, json_payload: dict[str, Any] | None = None) -> WahaResponse:
         url = f"{self._base_url}/{path.lstrip('/')}"
+        params = {"session": self._session} if self._session else None
 
         try:
             response = requests.request(
                 method,
                 url,
+                params=params,
                 headers=self._headers(json_body=json_payload is not None),
                 json=json_payload,
                 timeout=frappe.conf.get("waha_timeout", 30),
@@ -111,7 +113,7 @@ class WahaClient:
                 str(exc),
                 url=url,
                 method=method,
-                params={},
+                params=params or {},
                 request_payload=json_payload,
             ) from exc
 
@@ -138,49 +140,26 @@ class WahaClient:
             payload=payload,
             url=response.url,
             method=method,
-            params={},
+            params=params or {},
             request_payload=json_payload,
         )
 
     # ---- public API ------------------------------------------------------
 
     def send_text(self, phone: str, body: str, *, preview_url: bool = True) -> WahaResponse:
-        payload: dict[str, Any] = {
-            "chatId": self._as_chat_id(phone),
-            "text": body,
-            "reply_to": None,
-            "linkPreview": preview_url,
-            "linkPreviewHighQuality": False,
-        }
-        if self._session:
-            payload["session"] = self._session
+        payload = {"phone": phone, "body": body}
+        if preview_url:
+            payload["previewUrl"] = True
         return self._request("POST", "api/sendText", json_payload=payload)
 
     def send_media_from_url(self, phone: str, url: str, *, caption: str | None = None) -> WahaResponse:
-        payload: dict[str, Any] = {
-            "chatId": self._as_chat_id(phone),
-            "url": url,
-        }
+        payload = {"phone": phone, "url": url}
         if caption:
             payload["caption"] = caption
             payload["body"] = caption
-        if self._session:
-            payload["session"] = self._session
         return self._request("POST", "api/sendFileFromUrl", json_payload=payload)
 
     def send_reaction(self, phone: str, message_id: str, emoji: str) -> WahaResponse:
-        payload: dict[str, Any] = {
-            "chatId": self._as_chat_id(phone),
-            "messageId": message_id,
-            "reaction": emoji,
-        }
-        if self._session:
-            payload["session"] = self._session
+        payload = {"phone": phone, "messageId": message_id, "reaction": emoji}
         return self._request("POST", "api/sendReaction", json_payload=payload)
-
-    def _as_chat_id(self, phone: str) -> str:
-        phone = (phone or "").strip()
-        if phone.endswith("@c.us"):
-            return phone
-        return f"{phone}@c.us"
 
