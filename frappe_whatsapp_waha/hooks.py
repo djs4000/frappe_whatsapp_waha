@@ -12,11 +12,10 @@ app_license = "MIT"
 
 # include js, css files in header of desk.html
 app_include_css = [
-    "https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.5/build/css/intlTelInput.css",
     "/assets/frappe_whatsapp_waha/css/intl_tel_input.css",
 ]
 app_include_js = [
-    "https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.5/build/js/intlTelInput.min.js",
+    "/assets/frappe_whatsapp_waha/js/vendor/intl_tel_input.js",
     "/assets/frappe_whatsapp_waha/js/controls/intl_tel_input.js",
     "/assets/frappe_whatsapp_waha/js/frappe_whatsapp_waha.js",
 ]
