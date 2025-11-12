@@ -35,7 +35,30 @@ class WhatsAppMessage(Document):
         except WahaAPIError as exc:
             self.status = "Failed"
             self._log_api_error(exc.payload)
-            frappe.throw(f"Failed to send message: {exc.payload}")
+
+            debug_details = {
+                "url": exc.url,
+                "method": exc.method,
+                "params": exc.params,
+                "request_payload": exc.request_payload,
+                "response_payload": exc.payload,
+                "status_code": exc.status_code,
+                "error": str(exc),
+            }
+
+            debug_message = (
+                "WAHA request failed to send message.\n"
+                f"URL: {debug_details['url'] or 'Unknown'}\n"
+                f"Method: {debug_details['method'] or 'Unknown'}\n"
+                f"Params: {frappe.as_json(debug_details['params'] or {}, indent=2)}\n"
+                f"Request Payload: {frappe.as_json(debug_details['request_payload'] or {}, indent=2)}\n"
+                f"Response Payload: {frappe.as_json(debug_details['response_payload'] or {}, indent=2)}\n"
+                f"Status Code: {debug_details['status_code'] or 'Unknown'}\n"
+                f"Error: {debug_details['error']}"
+            )
+
+            print(debug_message)
+            frappe.throw(debug_message)
         except Exception:
             self.status = "Failed"
             raise
