@@ -16,16 +16,12 @@ def webhook():
 
 
 def get():
-	"""Get."""
-	hub_challenge = frappe.form_dict.get("hub.challenge")
-	webhook_verify_token = frappe.db.get_single_value(
-		"WhatsApp Settings", "webhook_verify_token"
-	)
+        """Get."""
+        hub_challenge = frappe.form_dict.get("hub.challenge")
+        if not hub_challenge:
+                return Response("", status=400)
 
-	if frappe.form_dict.get("hub.verify_token") != webhook_verify_token:
-		frappe.throw("Verify token does not match")
-
-	return Response(hub_challenge, status=200)
+        return Response(hub_challenge, status=200)
 
 def post():
 	"""Post."""
