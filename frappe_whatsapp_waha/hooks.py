@@ -95,9 +95,10 @@ before_install = "frappe_whatsapp_waha.install.before_install"
 # ---------------
 # Override standard doctype classes
 
-# override_doctype_class = {
-#   "ToDo": "custom_app.overrides.CustomToDo"
-# }
+override_doctype_class = {
+    "WhatsApp Message": "frappe_whatsapp_waha.frappe_whatsapp_waha.doctype.whatsapp_message.whatsapp_message.WhatsAppMessage",
+    "WhatsApp Settings": "frappe_whatsapp_waha.frappe_whatsapp_waha.doctype.whatsapp_settings.whatsapp_settings.WhatsAppSettings",
+}
 
 # Document Events
 # ---------------
@@ -153,10 +154,12 @@ scheduler_events = {
 # Overriding Methods
 # ------------------------------
 #
-# override_whitelisted_methods = {
-#   "frappe.desk.doctype.event.event.get_events": "frappe_whatsapp_waha.event.get_events"
-# }
-#
+override_whitelisted_methods = {
+    "frappe.integrations.doctype.whatsapp_message.whatsapp_message.send_message": "frappe_whatsapp_waha.api.send_message",
+    "frappe.integrations.doctype.whatsapp_message.whatsapp_message.send_whatsapp_message": "frappe_whatsapp_waha.api.send_whatsapp_message",
+    "frappe.integrations.doctype.whatsapp_message.whatsapp_message.get_message_status": "frappe_whatsapp_waha.api.get_message_status",
+}
+
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
 # along with any modifications made in other Frappe apps
