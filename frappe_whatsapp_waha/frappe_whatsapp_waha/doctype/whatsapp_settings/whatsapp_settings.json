@@ -11,8 +11,7 @@
   "url",
   "session",
   "token",
-  "waha_webhook_url",
-  "webhook_verify_token"
+  "waha_webhook_url"
  ],
  "fields": [
   {
@@ -57,12 +56,7 @@
    "description": "Provide this URL to WAHA to send webhook events back to Frappe.",
    "no_copy": 1
   },
-  {
-   "fieldname": "webhook_verify_token",
-   "fieldtype": "Data",
-   "label": "Webhook Verify Token"
-  }
- ],
+],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
