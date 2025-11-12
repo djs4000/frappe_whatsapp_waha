@@ -48,11 +48,10 @@ frappe.ui.form.ControlIntlTelInput = class ControlIntlTelInput extends frappe.ui
 
         const initOptions = {
             preferredCountries: preferred.length ? preferred : ["us", "in"],
-            initialCountry: (this.df.default_country || "ae").toLowerCase(),
+            initialCountry: (this.df.default_country || "auto").toLowerCase(),
             separateDialCode: true,
             strictMode: true,
             validationNumberTypes: ["FIXED_LINE_OR_MOBILE"],
-            placeholderNumberType: "MOBILE",
             loadUtils: () => import(INTL_TEL_INPUT_UTILS_CDN),
         };
 
